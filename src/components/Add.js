@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
-
+import { ResultCard } from "./ResultCard";
 export const Add = () => {
 
 
   const [query, setQuery] = useState("")
+  const [results, setResults] = useState([])
 
   const onChange = e => {
     e.preventDefault()
@@ -15,10 +16,17 @@ export const Add = () => {
       '&page=1',
     ]
     params = [...params].join('')
-    const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}${params}&query=${query}`
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}${params}&query=${e.target.value}`
 
     fetch(url).then(res => res.json())
-      .then(data => console.log(data))
+      .then(data => {
+        if (!data.errors) {
+          setResults(data.results)
+        }
+        else {
+          setResults([])
+        }
+      })
 
   }
 
@@ -32,6 +40,17 @@ export const Add = () => {
               value={query}
               onChange={onChange} />
           </div>
+
+          {results.length > 0 && (
+            <ul className="results">
+              {results.map(movie => (
+                <li key={movie.id}>
+                  <ResultCard movie={movie} />
+                </li>
+              ))}
+            </ul>
+          )}
+
         </div>
       </div>
     </div>
